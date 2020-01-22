@@ -5,6 +5,7 @@ const {
 } = require('clean-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 module.exports = {
     entry: {
         main: './src/index.js'
@@ -18,9 +19,19 @@ module.exports = {
         rules: [{
                 test: /\.js$/,
                 exclude: /node_modules/,
-                use: {
+                use: [{
                     loader: 'babel-loader'
-                }
+                },{
+                    loader: 'test-loader'
+                },{
+                    loader: 'async-loader'
+                }]
+            },
+            {
+              test: /\.vue$/,
+              use: {
+                  loader: 'vue-loader'
+              }  
             },
             {
                 test: /\.(sa|sc|c)ss$/,
@@ -49,7 +60,7 @@ module.exports = {
             },
             
             {
-                test: /\.(ttf|eot|svg||woff|woff2)$/,
+                test: /\.(ttf|eot|svg|woff|woff2)$/,
                 use: {
                     loader: 'url-loader',
                     options: {
@@ -59,6 +70,10 @@ module.exports = {
                 }
             }
         ]
+    },
+    resolveLoader: {
+        // 去哪些目录下寻找 Loader，有先后顺序之分
+        modules: ['node_modules', './loaders/']
     },
     optimization: {
         runtimeChunk: 'single',
@@ -81,10 +96,11 @@ module.exports = {
             filename: 'css/[name].[hash:5].css'
         }),
         new CleanWebpackPlugin(),
-        new OfflinePlugin({
-            ServiceWorker: {
-                events: true
-            }
-        })
+        // new OfflinePlugin({
+        //     ServiceWorker: {
+        //         events: true
+        //     }
+        // }),
+        new VueLoaderPlugin()
     ]
 }
